@@ -14,7 +14,6 @@ gem 'seed-fu', '~> 2.3'
 
 group :development do
   gem 'web-console', '~> 2.0'
-  gem 'spring'
 end
 
 group :test do

@@ -8,8 +8,8 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'jquery-rails'
 gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
+gem 'pry'
 gem 'pry-rails'
-gem 'pry-byebug'
 gem 'seed-fu', '~> 2.3'
 
 group :development do

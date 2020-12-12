@@ -32,4 +32,25 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  context '#full_name' do
+    subject { user.full_name }
+    it { is_expected.to eq "#{user.first_name} #{user.last_name}" }
+
+    context 'when first_name is nil' do
+      let(:user) { create(:user, first_name: nil) }
+      it { is_expected.to eq user.last_name }
+    end
+
+    context 'when last_name is nil' do
+      let(:user) { create(:user, last_name: nil) }
+      it { is_expected.to eq user.first_name }
+    end
+
+    context 'when first_name and last_name is nil' do
+      let(:user) { create(:user, :nanashi) }
+      it { is_expected.to eq '' }
+      it { is_expected.not_to be_nil }
+    end
+  end
 end

@@ -5,5 +5,10 @@ FactoryBot.define do
     last_name  { 'Doe' }
     gender { 'male' }
     member { false }
+
+    trait :nanashi do
+      first_name { nil }
+      last_name  { nil }
+    end
   end
 end

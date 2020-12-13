@@ -25,82 +25,40 @@ RSpec.describe 'Users', type: :request do
     end
   end
 
-  context 'responseがhtmlの場合' do
-    let(:mime_type) { 'text/html' }
+  let(:mime_type) { 'text/html' }
 
-    shared_examples :success do
-      it { is_expected.to have_http_status(:found) }
-      it { expect(subject.content_type).to eq mime_type }
-    end
-
-    context 'emailを更新する場合' do
-      let(:email) { 'new@example.com' }
-      let(:params) { super().merge(email: email) }
-      it { expect(reloaded_user.email).to eq email }
-      it_behaves_like :success
-    end
-
-    context 'first_nameを更新する場合' do
-      let(:first_name) { 'JIRO' }
-      let(:params) { super().merge(first_name: first_name) }
-      it { expect(reloaded_user.first_name).to eq first_name }
-      it_behaves_like :success
-    end
-
-    context 'memberを更新する場合' do
-      let(:member) { !user.member }
-      let(:params) { super().merge(member: member) }
-      it { expect(reloaded_user.member).to eq member }
-      it_behaves_like :success
-    end
-
-    context 'failure' do
-      let(:params) { super().merge(email: other_user.email, first_name: other_user.first_name) }
-      context 'ユーザのemailを別ユーザのものに更新しようとした場合' do
-        it { is_expected.to have_http_status(:success) } # error, but status is ok
-        it { is_expected.to render_template(:edit) }
-        it_behaves_like :update_failure
-      end
-    end
+  shared_examples :success do
+    it { is_expected.to have_http_status(:found) }
+    it { expect(subject.content_type).to eq mime_type }
   end
 
-  context 'responseがjsonの場合' do
-    let(:mime_type) { 'application/json' }
-    let(:parsed_response) { JSON.parse(subject.body).with_indifferent_access }
+  context 'emailを更新する場合' do
+    let(:email) { 'new@example.com' }
+    let(:params) { super().merge(email: email) }
+    it { expect(reloaded_user.email).to eq email }
+    it_behaves_like :success
+  end
 
-    shared_examples :success do
-      it { is_expected.to have_http_status(:ok) }
-      it { expect(subject.content_type).to eq mime_type }
-    end
+  context 'first_nameを更新する場合' do
+    let(:first_name) { 'JIRO' }
+    let(:params) { super().merge(first_name: first_name) }
+    it { expect(reloaded_user.first_name).to eq first_name }
+    it_behaves_like :success
+  end
 
-    context 'emailを更新する場合' do
-      let(:email) { 'new@example.com' }
-      let(:params) { super().merge(email: email) }
-      it { expect(reloaded_user.email).to eq email }
-      it_behaves_like :success
-    end
+  context 'memberを更新する場合' do
+    let(:member) { !user.member }
+    let(:params) { super().merge(member: member) }
+    it { expect(reloaded_user.member).to eq member }
+    it_behaves_like :success
+  end
 
-    context 'first_nameを更新する場合' do
-      let(:first_name) { 'JIRO' }
-      let(:params) { super().merge(first_name: first_name) }
-      it { expect(reloaded_user.first_name).to eq first_name }
-      it_behaves_like :success
-    end
-
-    context 'memberを更新する場合' do
-      let(:member) { !user.member }
-      let(:params) { super().merge(member: member) }
-      it { expect(reloaded_user.member).to eq member }
-      it_behaves_like :success
-    end
-
-    context 'failure' do
-      let(:params) { super().merge(email: other_user.email, first_name: other_user.first_name) }
-      context 'ユーザのemailを別ユーザのものに更新しようとした場合' do
-        it { is_expected.to have_http_status(:unprocessable_entity) }
-        it { expect(parsed_response[:email][0]).to eq 'has already been taken' }
-        it_behaves_like :update_failure
-      end
+  context 'failure' do
+    let(:params) { super().merge(email: other_user.email, first_name: other_user.first_name) }
+    context 'ユーザのemailを別ユーザのものに更新しようとした場合' do
+      it { is_expected.to have_http_status(:success) } # error, but status is ok
+      it { is_expected.to render_template(:edit) }
+      it_behaves_like :update_failure
     end
   end
 end

@@ -11,26 +11,19 @@ RSpec.describe 'Users', type: :request do
       gender: 'female', member: true
     )
   }
+  let(:mime_type) { 'application/json' }
   let(:headers) { { accept: mime_type } }
   let(:params) { {} }
+  let(:parsed_response) { JSON.parse(response.body).with_indifferent_access }
 
-  before(:each) { subject }
   subject { patch user_path(user), { user: params }, headers; response }
-
-  # html, json共通の失敗ケース
-  shared_examples :update_failure do
-    it 'いずれの属性も更新されていないこと' do
-      expect(reloaded_user.email).not_to eq other_user.email
-      expect(reloaded_user.first_name).not_to eq other_user.first_name
-    end
-  end
-
-  let(:mime_type) { 'application/json' }
-  let(:parsed_response) { JSON.parse(subject.body).with_indifferent_access }
+  before(:each) { subject }
 
   shared_examples :success do
-    it { is_expected.to have_http_status(:ok) }
-    it { expect(subject.content_type).to eq mime_type }
+    it do
+      expect(response).to have_http_status(:ok)
+      expect(subject.content_type).to eq mime_type
+    end
   end
 
   context 'emailを更新する場合' do
@@ -57,9 +50,15 @@ RSpec.describe 'Users', type: :request do
   context 'failure' do
     let(:params) { super().merge(email: other_user.email, first_name: other_user.first_name) }
     context 'ユーザのemailを別ユーザのものに更新しようとした場合' do
-      it { is_expected.to have_http_status(:unprocessable_entity) }
-      it { expect(parsed_response[:email][0]).to eq 'has already been taken' }
-      it_behaves_like :update_failure
+      it do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(parsed_response[:email][0]).to eq 'has already been taken'
+      end
+
+      it 'いずれの属性も更新されていないこと' do
+        expect(reloaded_user.email).not_to eq other_user.email
+        expect(reloaded_user.first_name).not_to eq other_user.first_name
+      end
     end
   end
 end

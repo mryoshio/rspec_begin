@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+       - apt-get update -y
+       - apt-get install -y curl build-essential mysql-server mysql-client default-libmysqlclient-dev
+       - curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
+       - apt-get install -y nodejs 
+       - service mysql start
+       # - mysql -p${DB_ROOT_PASSWORD} -e "GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY 'root';"
+       - mysql -e "GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY 'root';"
+       - cp -v config/database.yml.example config/database.yml
+  pre_build:
+    commands:
+       - echo Started on `date`
+       - bundle -V
+       - bundle exec rake db:create db:migrate db:seed
+  build:
+    commands:
+       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+       - ruby -v
+       - bundle exec rspec spec spec/requests
